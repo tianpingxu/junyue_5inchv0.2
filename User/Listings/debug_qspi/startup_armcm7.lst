@@ -1,0 +1,2917 @@
+
+
+
+ARM Macro Assembler    Page 1 
+
+
+    1 00000000         ;/******************************************************
+                       ********************//**
+    2 00000000         ; * @file     startup_ARMCM7.s
+    3 00000000         ; * @brief    CMSIS Core Device Startup File for
+    4 00000000         ; *           ARMCM7 Device Series
+    5 00000000         ; * @version  V1.08
+    6 00000000         ; * @date     23. November 2012
+    7 00000000         ; *
+    8 00000000         ; * @note
+    9 00000000         ; *
+   10 00000000         ; ******************************************************
+                       ************************/
+   11 00000000         ;/* Copyright (c) 2011 - 2012 ARM LIMITED
+   12 00000000         ;
+   13 00000000         ;   All rights reserved.
+   14 00000000         ;   Redistribution and use in source and binary forms, w
+                       ith or without
+   15 00000000         ;   modification, are permitted provided that the follow
+                       ing conditions are met:
+   16 00000000         ;   - Redistributions of source code must retain the abo
+                       ve copyright
+   17 00000000         ;     notice, this list of conditions and the following 
+                       disclaimer.
+   18 00000000         ;   - Redistributions in binary form must reproduce the 
+                       above copyright
+   19 00000000         ;     notice, this list of conditions and the following 
+                       disclaimer in the
+   20 00000000         ;     documentation and/or other materials provided with
+                        the distribution.
+   21 00000000         ;   - Neither the name of ARM nor the names of its contr
+                       ibutors may be used
+   22 00000000         ;     to endorse or promote products derived from this s
+                       oftware without
+   23 00000000         ;     specific prior written permission.
+   24 00000000         ;   *
+   25 00000000         ;   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS A
+                       ND CONTRIBUTORS "AS IS"
+   26 00000000         ;   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BU
+                       T NOT LIMITED TO, THE
+   27 00000000         ;   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FO
+                       R A PARTICULAR PURPOSE
+   28 00000000         ;   ARE DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDERS 
+                       AND CONTRIBUTORS BE
+   29 00000000         ;   LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL
+                       , EXEMPLARY, OR
+   30 00000000         ;   CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO
+                       , PROCUREMENT OF
+   31 00000000         ;   SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
+                       PROFITS; OR BUSINESS
+   32 00000000         ;   INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LI
+                       ABILITY, WHETHER IN
+   33 00000000         ;   CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLI
+                       GENCE OR OTHERWISE)
+   34 00000000         ;   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, 
+                       EVEN IF ADVISED OF THE
+   35 00000000         ;   POSSIBILITY OF SUCH DAMAGE.
+   36 00000000         ;   ----------------------------------------------------
+                       -----------------------*/
+   37 00000000         ;/*
+
+
+
+ARM Macro Assembler    Page 2 
+
+
+   38 00000000         ;//-------- <<< Use Configuration Wizard in Context Menu
+                        >>> ------------------
+   39 00000000         ;*/
+   40 00000000         
+   41 00000000         ; Amount of memory (in bytes) allocated for Stack
+   42 00000000         ; Tailor this value to your application needs
+   43 00000000         ; <h> Stack Configuration
+   44 00000000         ;   <o> Stack Size (in Bytes) <0x0-0xFFFFFFFF:8>
+   45 00000000         ; </h>
+   46 00000000         
+   47 00000000 0000A000 
+                       Stack_Size
+                               EQU              0x0000A000
+   48 00000000         
+   49 00000000                 AREA             STACK, NOINIT, READWRITE, ALIGN
+=3
+   50 00000000         Stack_Mem
+                               SPACE            Stack_Size
+   51 0000A000         __initial_sp
+   52 0000A000         
+   53 0000A000         
+   54 0000A000         ; <h> Heap Configuration
+   55 0000A000         ;   <o>  Heap Size (in Bytes) <0x0-0xFFFFFFFF:8>
+   56 0000A000         ; </h>
+   57 0000A000         
+   58 0000A000 00002000 
+                       Heap_Size
+                               EQU              0x00002000
+   59 0000A000         
+   60 0000A000                 AREA             HEAP, NOINIT, READWRITE, ALIGN=
+3
+   61 00000000         __heap_base
+   62 00000000         Heap_Mem
+                               SPACE            Heap_Size
+   63 00002000         __heap_limit
+   64 00002000         
+   65 00002000         
+   66 00002000                 PRESERVE8
+   67 00002000                 THUMB
+   68 00002000         
+   69 00002000         
+   70 00002000         ; Vector Table Mapped to Address 0 at Reset
+   71 00002000         
+   72 00002000                 AREA             RESET, DATA, READONLY
+   73 00000000                 EXPORT           __Vectors
+   74 00000000                 EXPORT           __Vectors_End
+   75 00000000                 EXPORT           __Vectors_Size
+   76 00000000         
+   77 00000000 2000FFFC 
+                       __Vectors
+                               DCD              0x20000000+0x0fffc ;0x20000000+
+                                                            0x0fffc      ;__ini
+                                                            tial_sp        ; To
+                                                            p of Stack
+   78 00000004 00000000        DCD              Reset_Handler ; Reset Handler
+   79 00000008 00000000        DCD              NMI_Handler ; NMI Handler
+   80 0000000C 00000000        DCD              HardFault_Handler ; Hard Fault 
+                                                            Handler
+   81 00000010 00000000        DCD              MemManage_Handler 
+
+
+
+ARM Macro Assembler    Page 3 
+
+
+                                                            ; MPU Fault Handler
+                                                            
+   82 00000014 00000000        DCD              BusFault_Handler 
+                                                            ; Bus Fault Handler
+                                                            
+   83 00000018 00000000        DCD              UsageFault_Handler ; Usage Faul
+                                                            t Handler
+   84 0000001C 00000000        DCD              0           ; Reserved
+   85 00000020 00000000        DCD              0           ; Reserved
+   86 00000024 00000000        DCD              0           ; Reserved
+   87 00000028 00000000        DCD              0           ; Reserved
+   88 0000002C 00000000        DCD              SVC_Handler ; SVCall Handler
+   89 00000030 00000000        DCD              DebugMon_Handler ; Debug Monito
+                                                            r Handler
+   90 00000034 00000000        DCD              0           ; Reserved
+   91 00000038 00000000        DCD              PendSV_Handler ; PendSV Handler
+                                                            
+   92 0000003C 00000000        DCD              SysTick_Handler 
+                                                            ; SysTick Handler
+   93 00000040         
+   94 00000040         ; External Interrupts
+   95 00000040 00000000        DCD              OTP_IRQHandler ;  0:  OTP
+   96 00000044 00000000        DCD              PMU_IRQHandler ;  1:  PMU
+   97 00000048 00000000        DCD              TC1_IRQHandler ;  2:  TC
+   98 0000004C 00000000        DCD              PIT1_IRQHandler ;  3:  PIT1
+   99 00000050 00000000        DCD              PIT2_IRQHandler ;  4:  PIT2
+  100 00000054 00000000        DCD              TC2_IRQHandler ;  5:  ENCR
+  101 00000058 00000000        DCD              TC3_IRQHandler ;  6:  ENCR1
+  102 0000005C 00000000        DCD              DMA1_IRQHandler ;  7:  DMA
+  103 00000060 00000000        DCD              DMA2_IRQHandler ;  8:  DMA2
+  104 00000064 00000000        DCD              0           ;  9 : Reserved
+  105 00000068 00000000        DCD              TRNG_IRQHandler ; 10:  TRNG
+  106 0000006C 00000000        DCD              SEC_FD_IRQHandler ; 11:  SEC_FD
+                                                            
+  107 00000070 00000000        DCD              0           ; 12: Reserved
+  108 00000074 00000000        DCD              0           ; 13: Reserved
+  109 00000078 00000000        DCD              CPM_IRQHandler ; 14:  CPM
+  110 0000007C 00000000        DCD              PMU_RTC_IRQHandler 
+                                                            ; 15:  PMU RTC
+  111 00000080 00000000        DCD              SD_IRQHandler ; 16:  SD
+  112 00000084 00000000        DCD              DMA2D_IRQHandler ; 17:  DMA2D
+  113 00000088 00000000        DCD              0           ; 18: Reserved
+  114 0000008C 00000000        DCD              AESSM4_IRQHandler 
+                                                            ; 19:  AES&SM4
+  115 00000090 00000000        DCD              QADC_IRQHandler ; 20:  QADC
+  116 00000094 00000000        DCD              DAC_IRQHandler ; 21:  DAC
+  117 00000098 00000000        DCD              0           ; 22: Reserved
+  118 0000009C 00000000        DCD              UART5_IRQHandler ; 23:  UART5
+  119 000000A0 00000000        DCD              USB_IRQHandler ; 24:  USBC
+  120 000000A4 00000000        DCD              UART6_IRQHandler ; 25:  UART6
+  121 000000A8 00000000        DCD              SPI1_IRQHandler ; 26:  SPI1
+  122 000000AC 00000000        DCD              SPI2_IRQHandler ; 27:  SPI2
+  123 000000B0 00000000        DCD              SPI3_IRQHandler ; 28:  SPI3
+  124 000000B4 00000000        DCD              SPIM1_IRQHandler ; 29:  SPIM1
+  125 000000B8 00000000        DCD              SPIM2_IRQHandler ; 30:  SPIM2
+  126 000000BC 00000000        DCD              SPIM3_IRQHandler ; 31:  SPIM3
+  127 000000C0 00000000        DCD              UART1_IRQHandler ; 32:  UART1
+  128 000000C4 00000000        DCD              UART2_IRQHandler ; 33:  UART2
+  129 000000C8 00000000        DCD              PSRAM_IRQHandler ; 34:  PSRAM
+
+
+
+ARM Macro Assembler    Page 4 
+
+
+  130 000000CC 00000000        DCD              GMAC_IRQHandler ; 35:  GMCA
+  131 000000D0 00000000        DCD              I2C1_IRQHandler ; 36: I2C1
+  132 000000D4 00000000        DCD              0           ; 37: Reserved
+  133 000000D8 00000000        DCD              0           ; 38: Reserved
+  134 000000DC 00000000        DCD              0           ; 39: Reserved
+  135 000000E0 00000000        DCD              0           ; 40: Reserved     
+                                                                               
+                                                                    
+  136 000000E4 00000000        DCD              EPORT0_0_IRQHandler 
+                                                            ; 41: EPORT0_0
+  137 000000E8 00000000        DCD              EPORT0_1_IRQHandler 
+                                                            ; 42: EPORT0_1
+  138 000000EC 00000000        DCD              EPORT0_2_IRQHandler 
+                                                            ; 43: EPORT0_2
+  139 000000F0 00000000        DCD              EPORT0_3_IRQHandler 
+                                                            ; 44: EPORT0_3
+  140 000000F4 00000000        DCD              EPORT0_4_IRQHandler 
+                                                            ; 45: EPORT0_4
+  141 000000F8 00000000        DCD              EPORT0_5_IRQHandler 
+                                                            ; 46: EPORT0_5
+  142 000000FC 00000000        DCD              EPORT0_6_IRQHandler 
+                                                            ; 47: EPORT0_6
+  143 00000100 00000000        DCD              EPORT0_7_IRQHandler 
+                                                            ; 48: EPORT0_7
+  144 00000104 00000000        DCD              EPORT1_0_IRQHandler 
+                                                            ; 49: EPORT1_0
+  145 00000108 00000000        DCD              EPORT1_1_IRQHandler 
+                                                            ; 50: EPORT1_1
+  146 0000010C 00000000        DCD              EPORT1_2_IRQHandler 
+                                                            ; 51: EPORT1_2
+  147 00000110 00000000        DCD              EPORT1_3_IRQHandler 
+                                                            ; 52: EPORT1_3
+  148 00000114 00000000        DCD              EPORT1_4_IRQHandler 
+                                                            ; 53: EPORT1_4
+  149 00000118 00000000        DCD              EPORT1_5_IRQHandler 
+                                                            ; 54: EPORT1_5
+  150 0000011C 00000000        DCD              EPORT1_6_IRQHandler 
+                                                            ; 55: EPORT1_6
+  151 00000120 00000000        DCD              EPORT1_7_IRQHandler 
+                                                            ; 56: EPORT1_7
+  152 00000124 00000000        DCD              SSISLV1_IRQHandler 
+                                                            ; 57: SSISLV1
+  153 00000128 00000000        DCD              JPEG_ACCELERATOR_IRQHandler ; 5
+                                                            8: JPEG_ACCELERATOR
+                                                                            
+  154 0000012C 00000000        DCD              I2C2_IRQHandler ; 59:  I2C2    
+                                                            
+  155 00000130 00000000        DCD              AXIDMA_IRQHandler ; 60: AXIDMA 
+                                                                               
+                                                                               
+                                                             
+  156 00000134 00000000        DCD              UART3_IRQHandler ; 61:  UART3  
+                                                                          
+  157 00000138 00000000        DCD              UART4_IRQHandler ; 62:  UART4  
+                                                                          
+  158 0000013C 00000000        DCD              LCDC_ROT_ERROR_IRQHandler ; 63:
+                                                              LCDCROT_ERROR  In
+                                                            terrupt            
+                                                                
+
+
+
+ARM Macro Assembler    Page 5 
+
+
+  159 00000140 00000000        DCD              CAN1_BUF00_03_IRQHandler ; 64: 
+                                                             CAN1_BUF00_03
+  160 00000144 00000000        DCD              CAN1_BUF04_07_IRQHandler ; 65: 
+                                                             CAN1_BUF04_07
+  161 00000148 00000000        DCD              CAN1_BUF08_11_IRQHandler ; 66: 
+                                                             CAN1_BUF08_11
+  162 0000014C 00000000        DCD              CAN1_BUF12_15_IRQHandler ; 67: 
+                                                             CAN1_BUF12_15
+  163 00000150 00000000        DCD              CAN1_BUF16_31_IRQHandler ; 68: 
+                                                             CAN1_BUF16_31
+  164 00000154 00000000        DCD              CAN1_BUF32_63_IRQHandler ; 69: 
+                                                             CAN1_BUF32_63     
+                                                                       
+  165 00000158 00000000        DCD              BOFF_TRWARN_IRQHandler 
+                                                            ; 70:  BOFF_TRWARN
+  166 0000015C 00000000        DCD              CAN1_ERR_IRQHandler 
+                                                            ; 71:  CAN1_ERR
+  167 00000160 00000000        DCD              CAN2_BUF00_03_IRQHandler ; 72: 
+                                                             CAN1_BUF00_03
+  168 00000164 00000000        DCD              CAN2_BUF04_07_IRQHandler ; 73: 
+                                                             CAN1_BUF04_07
+  169 00000168 00000000        DCD              CAN2_BUF08_11_IRQHandler ; 74: 
+                                                             CAN1_BUF08_11
+  170 0000016C 00000000        DCD              CAN2_BUF12_15_IRQHandler ; 75: 
+                                                             CAN1_BUF12_15
+  171 00000170 00000000        DCD              CAN2_BUF16_31_IRQHandler ; 76: 
+                                                             CAN1_BUF16_31
+  172 00000174 00000000        DCD              CAN2_BUF32_63_IRQHandler ; 77: 
+                                                             CAN1_BUF32_63     
+                                                                       
+  173 00000178 00000000        DCD              BOFF2_TRWARN_IRQHandler 
+                                                            ; 78:  BOFF_TRWARN
+  174 0000017C 00000000        DCD              CAN2_ERR_IRQHandler ; 79:  CAN1
+                                                            _ERR               
+                                                             
+  175 00000180 00000000        DCD              I2S1_IRQHandler ; 80:  I2S1
+  176 00000184 00000000        DCD              I2S2_IRQHandler ; 81:  I2S2
+  177 00000188 00000000        DCD              LCDC_CRC_ERROR_IRQHandler ; 82:
+                                                              LCDC_CRC_ERROR
+  178 0000018C 00000000        DCD              LCDC_REG_RELOAD_IRQHandler ; 83
+                                                            :  LCDC_REG_RELOAD
+  179 00000190 00000000        DCD              PWMT1_IRQHandler ; 84:  PWMT1  
+                                                                          
+  180 00000194 00000000        DCD              PWMT2_IRQHandler ; 85:  PWMT2
+  181 00000198 00000000        DCD              PWMT3_IRQHandler ; 86:  PWMT3
+  182 0000019C 00000000        DCD              LCDC_BUS_ERROR_IRQHandler ; 87:
+                                                              LCDC_BUS_ERROR
+  183 000001A0 00000000        DCD              LCDC_FIFO_UNDERRUN_IRQHandler ;
+                                                            88:LCDC_FIFO_UNDERR
+                                                            UN
+  184 000001A4 00000000        DCD              LCDC_FIFO_WARN_IRQHandler ;89: 
+                                                              LCDC_FIFO_WARN
+  185 000001A8 00000000        DCD              LCDC_IRQ_SCANLINE_IRQHandler ; 
+                                                            90:LCDC_IRQ_SCANLIN
+                                                            E
+  186 000001AC 00000000        DCD              IMGAGE_DECODER_IRQHandler ; ; 9
+                                                            1: image decoder
+  187 000001B0 00000000        DCD              EPORT2_0_IRQHandler 
+                                                            ; 92: EPORT2_0
+
+
+
+ARM Macro Assembler    Page 6 
+
+
+  188 000001B4 00000000        DCD              EPORT2_1_IRQHandler ; 93: EPORT
+                                                            2_1                
+                                                            
+  189 000001B8 00000000        DCD              EPORT2_2_IRQHandler 
+                                                            ; 94: EPORT2_2
+  190 000001BC 00000000        DCD              EPORT2_3_IRQHandler 
+                                                            ; 95: EPORT2_3
+  191 000001C0 00000000        DCD              EPORT2_4_IRQHandler 
+                                                            ; 96: EPORT2_4
+  192 000001C4 00000000        DCD              EPORT2_5_IRQHandler 
+                                                            ; 97: EPORT2_5
+  193 000001C8 00000000        DCD              EPORT2_6_IRQHandler 
+                                                            ; 98: EPORT2_6
+  194 000001CC 00000000        DCD              EPORT2_7_IRQHandler 
+                                                            ; 99: EPORT2_7
+  195 000001D0 00000000        DCD              EPORT3_0_IRQHandler 
+                                                            ; 100: EPORT3_0
+  196 000001D4 00000000        DCD              EPORT3_1_IRQHandler ; 101: EPOR
+                                                            T3_1               
+                                                             
+  197 000001D8 00000000        DCD              EPORT3_2_IRQHandler 
+                                                            ; 102: EPORT3_2
+  198 000001DC 00000000        DCD              EPORT3_3_IRQHandler 
+                                                            ; 103: EPORT3_3
+  199 000001E0 00000000        DCD              EPORT3_4_IRQHandler 
+                                                            ; 104: EPORT3_4
+  200 000001E4 00000000        DCD              EPORT3_5_IRQHandler 
+                                                            ; 105: EPORT3_5
+  201 000001E8 00000000        DCD              EPORT3_6_IRQHandler 
+                                                            ; 106: EPORT3_6
+  202 000001EC 00000000        DCD              EPORT3_7_IRQHandler ; 107: EPOR
+                                                            T3_7               
+                                                             
+  203 000001F0 00000000        DCD              EPORT4_0_IRQHandler 
+                                                            ; 108: EPORT4_0
+  204 000001F4 00000000        DCD              EPORT4_1_IRQHandler ; 109: EPOR
+                                                            T4_1               
+                                                             
+  205 000001F8 00000000        DCD              EPORT4_2_IRQHandler 
+                                                            ; 110: EPORT4_2
+  206 000001FC 00000000        DCD              EPORT4_3_IRQHandler 
+                                                            ; 111: EPORT4_3
+  207 00000200 00000000        DCD              EPORT4_4_IRQHandler 
+                                                            ; 112: EPORT4_4
+  208 00000204 00000000        DCD              EPORT4_5_IRQHandler 
+                                                            ; 113: EPORT4_5
+  209 00000208 00000000        DCD              EPORT4_6_IRQHandler 
+                                                            ; 114: EPORT4_6
+  210 0000020C 00000000        DCD              EPORT4_7_IRQHandler 
+                                                            ; 115: EPORT4_7
+  211 00000210 00000000        DCD              EPORT5_0_IRQHandler 
+                                                            ; 116: EPORT5_0
+  212 00000214 00000000        DCD              EPORT5_1_IRQHandler ; 117: EPOR
+                                                            T5_1               
+                                                             
+  213 00000218 00000000        DCD              EPORT5_2_IRQHandler 
+                                                            ; 118: EPORT5_2
+  214 0000021C 00000000        DCD              EPORT5_3_IRQHandler 
+                                                            ; 119: EPORT5_3
+
+
+
+ARM Macro Assembler    Page 7 
+
+
+  215 00000220 00000000        DCD              EPORT5_4_IRQHandler 
+                                                            ; 120: EPORT5_4
+  216 00000224 00000000        DCD              EPORT5_5_IRQHandler 
+                                                            ; 121: EPORT5_5
+  217 00000228 00000000        DCD              EPORT5_6_IRQHandler 
+                                                            ; 122: EPORT5_6
+  218 0000022C 00000000        DCD              EPORT5_7_IRQHandler ; 123: EPOR
+                                                            T5_7               
+                                                             
+  219 00000230 00000000        DCD              EPORT6_0_IRQHandler 
+                                                            ; 124: EPORT6_0
+  220 00000234 00000000        DCD              EPORT6_1_IRQHandler ; 125: EPOR
+                                                            T6_1               
+                                                             
+  221 00000238 00000000        DCD              EPORT6_2_IRQHandler 
+                                                            ; 126: EPORT6_2
+  222 0000023C 00000000        DCD              EPORT6_3_IRQHandler 
+                                                            ; 127: EPORT6_3
+  223 00000240 00000000        DCD              EPORT6_4_IRQHandler 
+                                                            ; 128: EPORT6_4
+  224 00000244 00000000        DCD              EPORT6_5_IRQHandler 
+                                                            ; 129: EPORT6_5
+  225 00000248 00000000        DCD              EPORT6_6_IRQHandler 
+                                                            ; 130: EPORT6_6
+  226 0000024C 00000000        DCD              EPORT6_7_IRQHandler 
+                                                            ; 131: EPORT6_7
+  227 00000250 00000000        DCD              EPORT7_0_IRQHandler 
+                                                            ; 132: EPORT7_0
+  228 00000254 00000000        DCD              EPORT7_1_IRQHandler ; 133: EPOR
+                                                            T7_1               
+                                                             
+  229 00000258 00000000        DCD              EPORT7_2_IRQHandler 
+                                                            ; 134: EPORT7_2
+  230 0000025C 00000000        DCD              EPORT7_3_IRQHandler 
+                                                            ; 135: EPORT7_3
+  231 00000260 00000000        DCD              EPORT7_4_IRQHandler 
+                                                            ; 136: EPORT7_4
+  232 00000264 00000000        DCD              EPORT7_5_IRQHandler 
+                                                            ; 137: EPORT7_5
+  233 00000268 00000000        DCD              EPORT7_6_IRQHandler 
+                                                            ; 138: EPORT7_6
+  234 0000026C 00000000        DCD              EPORT7_7_IRQHandler 
+                                                            ; 139: EPORT7_7
+  235 00000270 00000000        DCD              EPORT8_0_IRQHandler 
+                                                            ; 140: EPORT8_0
+  236 00000274 00000000        DCD              EPORT8_1_IRQHandler ; 141: EPOR
+                                                            T8_1               
+                                                             
+  237 00000278 00000000        DCD              EPORT8_2_IRQHandler 
+                                                            ; 142: EPORT8_2
+  238 0000027C 00000000        DCD              EPORT8_3_IRQHandler 
+                                                            ; 143: EPORT8_3
+  239 00000280 00000000        DCD              EPORT8_4_IRQHandler 
+                                                            ; 144: EPORT8_4
+  240 00000284 00000000        DCD              EPORT8_5_IRQHandler 
+                                                            ; 145: EPORT8_5
+  241 00000288 00000000        DCD              EPORT8_6_IRQHandler 
+                                                            ; 146: EPORT8_6
+  242 0000028C 00000000        DCD              EPORT8_7_IRQHandler 
+
+
+
+ARM Macro Assembler    Page 8 
+
+
+                                                            ; 147: EPORT8_7
+  243 00000290 00000000        DCD              EPORT9_0_IRQHandler 
+                                                            ; 148: EPORT9_0
+  244 00000294 00000000        DCD              EPORT9_1_IRQHandler ; 149: EPOR
+                                                            T9_1               
+                                                             
+  245 00000298 00000000        DCD              EPORT9_2_IRQHandler 
+                                                            ; 150: EPORT9_2
+  246 0000029C 00000000        DCD              EPORT9_3_IRQHandler 
+                                                            ; 151: EPORT9_3
+  247 000002A0 00000000        DCD              EPORT9_4_IRQHandler 
+                                                            ; 152: EPORT9_4
+  248 000002A4 00000000        DCD              EPORT9_5_IRQHandler 
+                                                            ; 153: EPORT9_5
+  249 000002A8 00000000        DCD              EPORT9_6_IRQHandler 
+                                                            ; 154: EPORT9_6
+  250 000002AC 00000000        DCD              EPORT9_7_IRQHandler 
+                                                            ; 155: EPORT9_7
+  251 000002B0         
+  252 000002B0         
+  253 000002B0         __Vectors_End
+  254 000002B0         
+  255 000002B0 000002B0 
+                       __Vectors_Size
+                               EQU              __Vectors_End - __Vectors
+  256 000002B0         
+  257 000002B0                 AREA             |.text|, CODE, READONLY
+  258 00000000         
+  259 00000000         
+  260 00000000         ; Reset Handler
+  261 00000000         
+  262 00000000         Reset_Handler
+                               PROC
+  263 00000000                 EXPORT           Reset_Handler             [WEAK
+]
+  264 00000000         
+  265 00000000                 IMPORT           LVD_EN
+  266 00000000 4822            LDR              R0, =LVD_EN
+  267 00000002 4780            BLX              R0
+  268 00000004         
+  269 00000004         ;set lvd level at 2.0V 
+  270 00000004 F04F 4080       MOV              r0,#0x40000000
+  271 00000008 F04F 2140       MOV              r1,#0x40004000
+  272 0000000C 65C8            STR              r0,[r1,#0x5c]
+  273 0000000E 0040            LSLS             r0,r0,#1
+  274 00000010 65C8            STR              r0,[r1,#0x5c]
+  275 00000012 1040            ASRS             r0,r0,#1
+  276 00000014 65C8            STR              r0,[r1,#0x5c]
+  277 00000016 4608            MOV              r0,r1
+  278 00000018 6DC0            LDR              r0,[r0,#0x5c]
+  279 0000001A F440 0080       ORR              r0,r0,#0x400000
+  280 0000001E 65C8            STR              r0,[r1,#0x5c]
+  281 00000020         
+  282 00000020 481B            LDR              r0,=0x01001314
+  283 00000022 F04F 2140       MOV              r1,#0x40004000
+  284 00000026 6548            STR              r0,[r1,#0x54]
+  285 00000028         
+  286 00000028 F04F 2140       MOV              r1,#0x40004000
+  287 0000002C 6DC8            LDR              r0,[r1,#0x5c]
+
+
+
+ARM Macro Assembler    Page 9 
+
+
+  288 0000002E F020 4040       BIC              r0,r0,#0xc0000000
+  289 00000032 65C8            STR              r0,[r1,#0x5c]
+  290 00000034         ;set lvd level at 2.0V end
+  291 00000034         
+  292 00000034                 IMPORT           IO_Latch_Clr
+  293 00000034 4817            LDR              R0, =IO_Latch_Clr
+  294 00000036 4780            BLX              R0
+  295 00000038         
+  296 00000038                 IMPORT           SystemInit
+  297 00000038                 IMPORT           __main
+  298 00000038         
+  299 00000038 F04F 000E       MOV              r0,#0xe
+  300 0000003C 4916            LDR              R1,=0x40005000
+  301 0000003E 8008            STRH             r0,[r1,#0]  ;Close WDT
+  302 00000040 F04F 0000       MOV              r0,#0
+  303 00000044 4915            LDR              r1,=0x40006000
+  304 00000046 8008            STRH             r0,[r1,#0]  ;Close TC    1
+  305 00000048         
+  306 00000048 F04F 0000       MOV              r0,#0
+  307 0000004C 4914            LDR              r1,=0x4000a000
+  308 0000004E 8008            STRH             r0,[r1,#0]  ;Close TC    2
+  309 00000050         
+  310 00000050 F04F 0000       MOV              r0,#0
+  311 00000054 4913            LDR              r1,=0x4000b000
+  312 00000056 8008            STRH             r0,[r1,#0]  ;Close TC    3
+  313 00000058         
+  314 00000058 4813            LDR              R0, =SystemInit
+  315 0000005A 4780            BLX              R0
+  316 0000005C F3BF 8F6F       ISB
+  317 00000060 F3BF 8F6F       ISB
+  318 00000064 4811            LDR              R0, =__initial_sp
+  319 00000066 F380 8808       MSR              MSP, R0     ; 
+  320 0000006A F3BF 8F6F       ISB
+  321 0000006E F3BF 8F6F       ISB
+  322 00000072 480F            LDR              R0, =__main
+  323 00000074 4700            BX               R0
+  324 00000076                 ENDP
+  325 00000076         
+  326 00000076         
+  327 00000076         ; Dummy Exception Handlers (infinite loops which can be 
+                       modified)
+  328 00000076         
+  329 00000076         NMI_Handler
+                               PROC
+  330 00000076                 EXPORT           NMI_Handler               [WEAK
+]
+  331 00000076 E7FE            B                .
+  332 00000078                 ENDP
+  334 00000078         HardFault_Handler
+                               PROC
+  335 00000078                 EXPORT           HardFault_Handler         [WEAK
+]
+  336 00000078 E7FE            B                .
+  337 0000007A                 ENDP
+  339 0000007A         MemManage_Handler
+                               PROC
+  340 0000007A                 EXPORT           MemManage_Handler         [WEAK
+]
+  341 0000007A E7FE            B                .
+
+
+
+ARM Macro Assembler    Page 10 
+
+
+  342 0000007C                 ENDP
+  344 0000007C         BusFault_Handler
+                               PROC
+  345 0000007C                 EXPORT           BusFault_Handler          [WEAK
+]
+  346 0000007C E7FE            B                .
+  347 0000007E                 ENDP
+  349 0000007E         UsageFault_Handler
+                               PROC
+  350 0000007E                 EXPORT           UsageFault_Handler        [WEAK
+]
+  351 0000007E E7FE            B                .
+  352 00000080                 ENDP
+  353 00000080         SVC_Handler
+                               PROC
+  354 00000080                 EXPORT           SVC_Handler               [WEAK
+]
+  355 00000080 E7FE            B                .
+  356 00000082                 ENDP
+  358 00000082         DebugMon_Handler
+                               PROC
+  359 00000082                 EXPORT           DebugMon_Handler          [WEAK
+]
+  360 00000082 E7FE            B                .
+  361 00000084                 ENDP
+  362 00000084         PendSV_Handler
+                               PROC
+  363 00000084                 EXPORT           PendSV_Handler            [WEAK
+]
+  364 00000084 E7FE            B                .
+  365 00000086                 ENDP
+  366 00000086         SysTick_Handler
+                               PROC
+  367 00000086                 EXPORT           SysTick_Handler           [WEAK
+]
+  368 00000086 E7FE            B                .
+  369 00000088                 ENDP
+  370 00000088         
+  371 00000088         Default_Handler
+                               PROC
+  372 00000088         
+  373 00000088                 EXPORT           OTP_IRQHandler                 
+[WEAK]
+  374 00000088                 EXPORT           PMU_IRQHandler                 
+[WEAK]
+  375 00000088                 EXPORT           TC1_IRQHandler                 
+ [WEAK]
+  376 00000088                 EXPORT           PIT1_IRQHandler                
+[WEAK]
+  377 00000088                 EXPORT           PIT2_IRQHandler                
+[WEAK]
+  378 00000088                 EXPORT           TC2_IRQHandler                 
+[WEAK]
+  379 00000088                 EXPORT           TC3_IRQHandler                 
+[WEAK]
+  380 00000088                 EXPORT           DMA1_IRQHandler                
+ [WEAK]
+  381 00000088                 EXPORT           DMA2_IRQHandler                
+[WEAK]
+
+
+
+ARM Macro Assembler    Page 11 
+
+
+  382 00000088                 EXPORT           TRNG_IRQHandler                
+[WEAK]
+  383 00000088                 EXPORT           SEC_FD_IRQHandler              
+[WEAK]
+  384 00000088                 EXPORT           CPM_IRQHandler                 
+[WEAK]
+  385 00000088                 EXPORT           PMU_RTC_IRQHandler             
+[WEAK]
+  386 00000088                 EXPORT           SD_IRQHandler                  
+[WEAK]
+  387 00000088                 EXPORT           DMA2D_IRQHandler               
+[WEAK]
+  388 00000088                 EXPORT           AESSM4_IRQHandler              
+[WEAK]
+  389 00000088                 EXPORT           QADC_IRQHandler                
+[WEAK]
+  390 00000088                 EXPORT           DAC_IRQHandler                 
+[WEAK]
+  391 00000088                 EXPORT           UART5_IRQHandler               
+[WEAK]
+  392 00000088                 EXPORT           USB_IRQHandler                 
+[WEAK]
+  393 00000088                 EXPORT           UART6_IRQHandler               
+[WEAK]
+  394 00000088                 EXPORT           SPI1_IRQHandler                
+[WEAK]
+  395 00000088                 EXPORT           SPI2_IRQHandler                
+[WEAK]
+  396 00000088                 EXPORT           SPI3_IRQHandler                
+[WEAK]
+  397 00000088                 EXPORT           SPIM1_IRQHandler               
+[WEAK]
+  398 00000088                 EXPORT           SPIM2_IRQHandler               
+[WEAK]
+  399 00000088                 EXPORT           SPIM3_IRQHandler               
+[WEAK]
+  400 00000088                 EXPORT           UART1_IRQHandler               
+[WEAK]
+  401 00000088                 EXPORT           UART2_IRQHandler               
+[WEAK]
+  402 00000088                 EXPORT           PSRAM_IRQHandler               
+[WEAK]
+  403 00000088                 EXPORT           GMAC_IRQHandler                
+[WEAK]
+  404 00000088                 EXPORT           I2C1_IRQHandler                
+[WEAK]
+  405 00000088                 EXPORT           EPORT0_0_IRQHandler            
+[WEAK]
+  406 00000088                 EXPORT           EPORT0_1_IRQHandler            
+[WEAK]
+  407 00000088                 EXPORT           EPORT0_2_IRQHandler            
+[WEAK]
+  408 00000088                 EXPORT           EPORT0_3_IRQHandler            
+[WEAK]
+  409 00000088                 EXPORT           EPORT0_4_IRQHandler            
+[WEAK]
+  410 00000088                 EXPORT           EPORT0_5_IRQHandler            
+[WEAK]
+  411 00000088                 EXPORT           EPORT0_6_IRQHandler            
+
+
+
+ARM Macro Assembler    Page 12 
+
+
+[WEAK]
+  412 00000088                 EXPORT           EPORT0_7_IRQHandler            
+[WEAK]
+  413 00000088                 EXPORT           EPORT1_0_IRQHandler            
+[WEAK]
+  414 00000088                 EXPORT           EPORT1_1_IRQHandler            
+[WEAK]
+  415 00000088                 EXPORT           EPORT1_2_IRQHandler            
+[WEAK]
+  416 00000088                 EXPORT           EPORT1_3_IRQHandler            
+[WEAK]
+  417 00000088                 EXPORT           EPORT1_4_IRQHandler            
+[WEAK]
+  418 00000088                 EXPORT           EPORT1_5_IRQHandler            
+[WEAK]
+  419 00000088                 EXPORT           EPORT1_6_IRQHandler            
+[WEAK]
+  420 00000088                 EXPORT           EPORT1_7_IRQHandler            
+[WEAK]
+  421 00000088                 EXPORT           SSISLV1_IRQHandler             
+[WEAK]
+  422 00000088                 EXPORT           JPEG_ACCELERATOR_IRQHandler    
+[WEAK]
+  423 00000088                 EXPORT           I2C2_IRQHandler                
+[WEAK]
+  424 00000088                 EXPORT           AXIDMA_IRQHandler              
+[WEAK]
+  425 00000088                 EXPORT           UART3_IRQHandler               
+[WEAK]
+  426 00000088                 EXPORT           UART4_IRQHandler               
+[WEAK]
+  427 00000088                 EXPORT           LCDC_ROT_ERROR_IRQHandler     [
+WEAK]
+  428 00000088                 EXPORT           CAN1_BUF00_03_IRQHandler       
+[WEAK]
+  429 00000088                 EXPORT           CAN1_BUF04_07_IRQHandler       
+[WEAK]
+  430 00000088                 EXPORT           CAN1_BUF08_11_IRQHandler       
+[WEAK]
+  431 00000088                 EXPORT           CAN1_BUF12_15_IRQHandler       
+[WEAK]
+  432 00000088                 EXPORT           CAN1_BUF16_31_IRQHandler       
+[WEAK]
+  433 00000088                 EXPORT           CAN1_BUF32_63_IRQHandler       
+[WEAK]
+  434 00000088                 EXPORT           BOFF_TRWARN_IRQHandler         
+[WEAK]
+  435 00000088                 EXPORT           CAN1_ERR_IRQHandler            
+[WEAK]
+  436 00000088                 EXPORT           CAN2_BUF00_03_IRQHandler       
+[WEAK]
+  437 00000088                 EXPORT           CAN2_BUF04_07_IRQHandler       
+[WEAK]
+  438 00000088                 EXPORT           CAN2_BUF08_11_IRQHandler       
+[WEAK]
+  439 00000088                 EXPORT           CAN2_BUF12_15_IRQHandler       
+[WEAK]
+  440 00000088                 EXPORT           CAN2_BUF16_31_IRQHandler       
+[WEAK]
+
+
+
+ARM Macro Assembler    Page 13 
+
+
+  441 00000088                 EXPORT           CAN2_BUF32_63_IRQHandler       
+[WEAK]
+  442 00000088                 EXPORT           BOFF2_TRWARN_IRQHandler        
+[WEAK]
+  443 00000088                 EXPORT           CAN2_ERR_IRQHandler            
+[WEAK]
+  444 00000088                 EXPORT           I2S1_IRQHandler                
+[WEAK]
+  445 00000088                 EXPORT           I2S2_IRQHandler                
+[WEAK]
+  446 00000088                 EXPORT           LCDC_CRC_ERROR_IRQHandler      
+[WEAK]
+  447 00000088                 EXPORT           LCDC_REG_RELOAD_IRQHandler     
+[WEAK]
+  448 00000088                 EXPORT           PWMT1_IRQHandler               
+[WEAK]
+  449 00000088                 EXPORT           PWMT2_IRQHandler               
+[WEAK]
+  450 00000088                 EXPORT           PWMT3_IRQHandler               
+[WEAK]
+  451 00000088                 EXPORT           LCDC_BUS_ERROR_IRQHandler      
+[WEAK]
+  452 00000088                 EXPORT           LCDC_FIFO_UNDERRUN_IRQHandler  
+[WEAK]
+  453 00000088                 EXPORT           LCDC_FIFO_WARN_IRQHandler      
+[WEAK]
+  454 00000088                 EXPORT           LCDC_IRQ_SCANLINE_IRQHandler   
+[WEAK]
+  455 00000088                 EXPORT           IMGAGE_DECODER_IRQHandler      
+ [WEAK]
+  456 00000088                 EXPORT           EPORT2_0_IRQHandler            
+[WEAK]
+  457 00000088                 EXPORT           EPORT2_1_IRQHandler            
+[WEAK]
+  458 00000088                 EXPORT           EPORT2_2_IRQHandler            
+[WEAK]
+  459 00000088                 EXPORT           EPORT2_3_IRQHandler            
+[WEAK]
+  460 00000088                 EXPORT           EPORT2_4_IRQHandler            
+[WEAK]
+  461 00000088                 EXPORT           EPORT2_5_IRQHandler            
+[WEAK]
+  462 00000088                 EXPORT           EPORT2_6_IRQHandler            
+[WEAK]
+  463 00000088                 EXPORT           EPORT2_7_IRQHandler            
+[WEAK]
+  464 00000088                 EXPORT           EPORT3_0_IRQHandler            
+[WEAK]
+  465 00000088                 EXPORT           EPORT3_1_IRQHandler            
+[WEAK]
+  466 00000088                 EXPORT           EPORT3_2_IRQHandler            
+[WEAK]
+  467 00000088                 EXPORT           EPORT3_3_IRQHandler            
+[WEAK]
+  468 00000088                 EXPORT           EPORT3_4_IRQHandler            
+[WEAK]
+  469 00000088                 EXPORT           EPORT3_5_IRQHandler            
+[WEAK]
+  470 00000088                 EXPORT           EPORT3_6_IRQHandler            
+
+
+
+ARM Macro Assembler    Page 14 
+
+
+[WEAK]
+  471 00000088                 EXPORT           EPORT3_7_IRQHandler            
+[WEAK]
+  472 00000088                 EXPORT           EPORT4_0_IRQHandler            
+[WEAK]
+  473 00000088                 EXPORT           EPORT4_1_IRQHandler            
+[WEAK]
+  474 00000088                 EXPORT           EPORT4_2_IRQHandler            
+[WEAK]
+  475 00000088                 EXPORT           EPORT4_3_IRQHandler            
+[WEAK]
+  476 00000088                 EXPORT           EPORT4_4_IRQHandler            
+[WEAK]
+  477 00000088                 EXPORT           EPORT4_5_IRQHandler            
+[WEAK]
+  478 00000088                 EXPORT           EPORT4_6_IRQHandler            
+[WEAK]
+  479 00000088                 EXPORT           EPORT4_7_IRQHandler            
+[WEAK]
+  480 00000088                 EXPORT           EPORT5_0_IRQHandler            
+[WEAK]
+  481 00000088                 EXPORT           EPORT5_1_IRQHandler            
+[WEAK]
+  482 00000088                 EXPORT           EPORT5_2_IRQHandler            
+[WEAK]
+  483 00000088                 EXPORT           EPORT5_3_IRQHandler            
+[WEAK]
+  484 00000088                 EXPORT           EPORT5_4_IRQHandler            
+[WEAK]
+  485 00000088                 EXPORT           EPORT5_5_IRQHandler            
+[WEAK]
+  486 00000088                 EXPORT           EPORT5_6_IRQHandler            
+[WEAK]
+  487 00000088                 EXPORT           EPORT5_7_IRQHandler            
+[WEAK]
+  488 00000088                 EXPORT           EPORT6_0_IRQHandler            
+[WEAK]
+  489 00000088                 EXPORT           EPORT6_1_IRQHandler            
+[WEAK]
+  490 00000088                 EXPORT           EPORT6_2_IRQHandler            
+[WEAK]
+  491 00000088                 EXPORT           EPORT6_3_IRQHandler            
+[WEAK]
+  492 00000088                 EXPORT           EPORT6_4_IRQHandler            
+[WEAK]
+  493 00000088                 EXPORT           EPORT6_5_IRQHandler            
+[WEAK]
+  494 00000088                 EXPORT           EPORT6_6_IRQHandler            
+[WEAK]
+  495 00000088                 EXPORT           EPORT6_7_IRQHandler            
+[WEAK]
+  496 00000088                 EXPORT           EPORT7_0_IRQHandler            
+[WEAK]
+  497 00000088                 EXPORT           EPORT7_1_IRQHandler            
+[WEAK]
+  498 00000088                 EXPORT           EPORT7_2_IRQHandler            
+[WEAK]
+  499 00000088                 EXPORT           EPORT7_3_IRQHandler            
+[WEAK]
+
+
+
+ARM Macro Assembler    Page 15 
+
+
+  500 00000088                 EXPORT           EPORT7_4_IRQHandler            
+[WEAK]
+  501 00000088                 EXPORT           EPORT7_5_IRQHandler            
+[WEAK]
+  502 00000088                 EXPORT           EPORT7_6_IRQHandler            
+[WEAK]
+  503 00000088                 EXPORT           EPORT7_7_IRQHandler            
+[WEAK]
+  504 00000088                 EXPORT           EPORT8_0_IRQHandler            
+[WEAK]
+  505 00000088                 EXPORT           EPORT8_1_IRQHandler            
+[WEAK]
+  506 00000088                 EXPORT           EPORT8_2_IRQHandler            
+[WEAK]
+  507 00000088                 EXPORT           EPORT8_3_IRQHandler            
+[WEAK]
+  508 00000088                 EXPORT           EPORT8_4_IRQHandler            
+[WEAK]
+  509 00000088                 EXPORT           EPORT8_5_IRQHandler            
+[WEAK]
+  510 00000088                 EXPORT           EPORT8_6_IRQHandler            
+[WEAK]
+  511 00000088                 EXPORT           EPORT8_7_IRQHandler            
+[WEAK]
+  512 00000088                 EXPORT           EPORT9_0_IRQHandler            
+[WEAK]
+  513 00000088                 EXPORT           EPORT9_1_IRQHandler            
+[WEAK]
+  514 00000088                 EXPORT           EPORT9_2_IRQHandler            
+[WEAK]
+  515 00000088                 EXPORT           EPORT9_3_IRQHandler            
+[WEAK]
+  516 00000088                 EXPORT           EPORT9_4_IRQHandler            
+[WEAK]
+  517 00000088                 EXPORT           EPORT9_5_IRQHandler            
+[WEAK]
+  518 00000088                 EXPORT           EPORT9_6_IRQHandler            
+[WEAK]
+  519 00000088                 EXPORT           EPORT9_7_IRQHandler            
+[WEAK]
+  520 00000088         
+  521 00000088         
+  522 00000088         OTP_IRQHandler
+  523 00000088         PMU_IRQHandler
+  524 00000088         TC1_IRQHandler
+  525 00000088         PIT1_IRQHandler
+  526 00000088         PIT2_IRQHandler
+  527 00000088         TC2_IRQHandler
+  528 00000088         TC3_IRQHandler
+  529 00000088         DMA1_IRQHandler
+  530 00000088         DMA2_IRQHandler
+  531 00000088         TRNG_IRQHandler
+  532 00000088         SEC_FD_IRQHandler
+  533 00000088         CPM_IRQHandler
+  534 00000088         PMU_RTC_IRQHandler
+  535 00000088         SD_IRQHandler
+  536 00000088         DMA2D_IRQHandler
+  537 00000088         AESSM4_IRQHandler
+  538 00000088         QADC_IRQHandler
+
+
+
+ARM Macro Assembler    Page 16 
+
+
+  539 00000088         DAC_IRQHandler
+  540 00000088         UART5_IRQHandler
+  541 00000088         USB_IRQHandler
+  542 00000088         UART6_IRQHandler
+  543 00000088         SPI1_IRQHandler
+  544 00000088         SPI2_IRQHandler
+  545 00000088         SPI3_IRQHandler
+  546 00000088         SPIM1_IRQHandler
+  547 00000088         SPIM2_IRQHandler
+  548 00000088         SPIM3_IRQHandler
+  549 00000088         UART1_IRQHandler
+  550 00000088         UART2_IRQHandler
+  551 00000088         PSRAM_IRQHandler
+  552 00000088         GMAC_IRQHandler
+  553 00000088         I2C1_IRQHandler
+  554 00000088         EPORT0_0_IRQHandler
+  555 00000088         EPORT0_1_IRQHandler
+  556 00000088         EPORT0_2_IRQHandler
+  557 00000088         EPORT0_3_IRQHandler
+  558 00000088         EPORT0_4_IRQHandler
+  559 00000088         EPORT0_5_IRQHandler
+  560 00000088         EPORT0_6_IRQHandler
+  561 00000088         EPORT0_7_IRQHandler
+  562 00000088         EPORT1_0_IRQHandler
+  563 00000088         EPORT1_1_IRQHandler
+  564 00000088         EPORT1_2_IRQHandler
+  565 00000088         EPORT1_3_IRQHandler
+  566 00000088         EPORT1_4_IRQHandler
+  567 00000088         EPORT1_5_IRQHandler
+  568 00000088         EPORT1_6_IRQHandler
+  569 00000088         EPORT1_7_IRQHandler
+  570 00000088         SSISLV1_IRQHandler
+  571 00000088         JPEG_ACCELERATOR_IRQHandler
+  572 00000088         I2C2_IRQHandler
+  573 00000088         AXIDMA_IRQHandler
+  574 00000088         UART3_IRQHandler
+  575 00000088         UART4_IRQHandler
+  576 00000088         LCDC_ROT_ERROR_IRQHandler
+  577 00000088         CAN1_BUF00_03_IRQHandler
+  578 00000088         CAN1_BUF04_07_IRQHandler
+  579 00000088         CAN1_BUF08_11_IRQHandler
+  580 00000088         CAN1_BUF12_15_IRQHandler
+  581 00000088         CAN1_BUF16_31_IRQHandler
+  582 00000088         CAN1_BUF32_63_IRQHandler
+  583 00000088         BOFF_TRWARN_IRQHandler
+  584 00000088         CAN1_ERR_IRQHandler
+  585 00000088         CAN2_BUF00_03_IRQHandler
+  586 00000088         CAN2_BUF04_07_IRQHandler
+  587 00000088         CAN2_BUF08_11_IRQHandler
+  588 00000088         CAN2_BUF12_15_IRQHandler
+  589 00000088         CAN2_BUF16_31_IRQHandler
+  590 00000088         CAN2_BUF32_63_IRQHandler
+  591 00000088         BOFF2_TRWARN_IRQHandler
+  592 00000088         CAN2_ERR_IRQHandler
+  593 00000088         I2S1_IRQHandler
+  594 00000088         I2S2_IRQHandler
+  595 00000088         LCDC_CRC_ERROR_IRQHandler
+  596 00000088         LCDC_REG_RELOAD_IRQHandler
+  597 00000088         PWMT1_IRQHandler
+
+
+
+ARM Macro Assembler    Page 17 
+
+
+  598 00000088         PWMT2_IRQHandler
+  599 00000088         PWMT3_IRQHandler
+  600 00000088         LCDC_BUS_ERROR_IRQHandler
+  601 00000088         LCDC_FIFO_UNDERRUN_IRQHandler
+  602 00000088         LCDC_FIFO_WARN_IRQHandler
+  603 00000088         LCDC_IRQ_SCANLINE_IRQHandler
+  604 00000088         IMGAGE_DECODER_IRQHandler
+  605 00000088         EPORT2_0_IRQHandler
+  606 00000088         EPORT2_1_IRQHandler
+  607 00000088         EPORT2_2_IRQHandler
+  608 00000088         EPORT2_3_IRQHandler
+  609 00000088         EPORT2_4_IRQHandler
+  610 00000088         EPORT2_5_IRQHandler
+  611 00000088         EPORT2_6_IRQHandler
+  612 00000088         EPORT2_7_IRQHandler
+  613 00000088         EPORT3_0_IRQHandler
+  614 00000088         EPORT3_1_IRQHandler
+  615 00000088         EPORT3_2_IRQHandler
+  616 00000088         EPORT3_3_IRQHandler
+  617 00000088         EPORT3_4_IRQHandler
+  618 00000088         EPORT3_5_IRQHandler
+  619 00000088         EPORT3_6_IRQHandler
+  620 00000088         EPORT3_7_IRQHandler
+  621 00000088         EPORT4_0_IRQHandler
+  622 00000088         EPORT4_1_IRQHandler
+  623 00000088         EPORT4_2_IRQHandler
+  624 00000088         EPORT4_3_IRQHandler
+  625 00000088         EPORT4_4_IRQHandler
+  626 00000088         EPORT4_5_IRQHandler
+  627 00000088         EPORT4_6_IRQHandler
+  628 00000088         EPORT4_7_IRQHandler
+  629 00000088         EPORT5_0_IRQHandler
+  630 00000088         EPORT5_1_IRQHandler
+  631 00000088         EPORT5_2_IRQHandler
+  632 00000088         EPORT5_3_IRQHandler
+  633 00000088         EPORT5_4_IRQHandler
+  634 00000088         EPORT5_5_IRQHandler
+  635 00000088         EPORT5_6_IRQHandler
+  636 00000088         EPORT5_7_IRQHandler
+  637 00000088         EPORT6_0_IRQHandler
+  638 00000088         EPORT6_1_IRQHandler
+  639 00000088         EPORT6_2_IRQHandler
+  640 00000088         EPORT6_3_IRQHandler
+  641 00000088         EPORT6_4_IRQHandler
+  642 00000088         EPORT6_5_IRQHandler
+  643 00000088         EPORT6_6_IRQHandler
+  644 00000088         EPORT6_7_IRQHandler
+  645 00000088         EPORT7_0_IRQHandler
+  646 00000088         EPORT7_1_IRQHandler
+  647 00000088         EPORT7_2_IRQHandler
+  648 00000088         EPORT7_3_IRQHandler
+  649 00000088         EPORT7_4_IRQHandler
+  650 00000088         EPORT7_5_IRQHandler
+  651 00000088         EPORT7_6_IRQHandler
+  652 00000088         EPORT7_7_IRQHandler
+  653 00000088         EPORT8_0_IRQHandler
+  654 00000088         EPORT8_1_IRQHandler
+  655 00000088         EPORT8_2_IRQHandler
+  656 00000088         EPORT8_3_IRQHandler
+
+
+
+ARM Macro Assembler    Page 18 
+
+
+  657 00000088         EPORT8_4_IRQHandler
+  658 00000088         EPORT8_5_IRQHandler
+  659 00000088         EPORT8_6_IRQHandler
+  660 00000088         EPORT8_7_IRQHandler
+  661 00000088         EPORT9_0_IRQHandler
+  662 00000088         EPORT9_1_IRQHandler
+  663 00000088         EPORT9_2_IRQHandler
+  664 00000088         EPORT9_3_IRQHandler
+  665 00000088         EPORT9_4_IRQHandler
+  666 00000088         EPORT9_5_IRQHandler
+  667 00000088         EPORT9_6_IRQHandler
+  668 00000088         EPORT9_7_IRQHandler
+  669 00000088         
+  670 00000088         
+  671 00000088 E7FE            B                .
+  672 0000008A         
+  673 0000008A                 ENDP
+  674 0000008A         
+  675 0000008A         
+  676 0000008A 00 00           ALIGN
+  677 0000008C         
+  678 0000008C         
+  679 0000008C         ; User Initial Stack & Heap
+  680 0000008C         
+  681 0000008C                 IF               :DEF:__MICROLIB
+  682 0000008C         
+  683 0000008C                 EXPORT           __initial_sp
+  684 0000008C                 EXPORT           __heap_base
+  685 0000008C                 EXPORT           __heap_limit
+  686 0000008C         
+  687 0000008C                 ELSE
+  702                          ENDIF
+  703 0000008C         
+  704 0000008C         
+  705 0000008C                 END
+              00000000 
+              01001314 
+              00000000 
+              40005000 
+              40006000 
+              4000A000 
+              4000B000 
+              00000000 
+              00000000 
+              00000000 
+Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M7.fp.sp --depen
+d=..\obj\obj_debug_qspi\startup_armcm7.d -o..\obj\obj_debug_qspi\startup_armcm7
+.o -ID:\AppData\keil_v5\ARM\Cortex_DFP\1.1.0\Device\ARMCM7\Include --predefine=
+"__MICROLIB SETA 1" --predefine="__UVISION_VERSION SETA 536" --predefine="ARMCM
+7 SETA 1" --list=.\listings\debug_qspi\startup_armcm7.lst ..\Src\core\startup_A
+RMCM7.s
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+STACK 00000000
+
+Symbol: STACK
+   Definitions
+      At line 49 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      None
+Comment: STACK unused
+Stack_Mem 00000000
+
+Symbol: Stack_Mem
+   Definitions
+      At line 50 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      None
+Comment: Stack_Mem unused
+__initial_sp 0000A000
+
+Symbol: __initial_sp
+   Definitions
+      At line 51 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 318 in file ..\Src\core\startup_ARMCM7.s
+      At line 683 in file ..\Src\core\startup_ARMCM7.s
+
+3 symbols
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+HEAP 00000000
+
+Symbol: HEAP
+   Definitions
+      At line 60 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      None
+Comment: HEAP unused
+Heap_Mem 00000000
+
+Symbol: Heap_Mem
+   Definitions
+      At line 62 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      None
+Comment: Heap_Mem unused
+__heap_base 00000000
+
+Symbol: __heap_base
+   Definitions
+      At line 61 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 684 in file ..\Src\core\startup_ARMCM7.s
+Comment: __heap_base used once
+__heap_limit 00002000
+
+Symbol: __heap_limit
+   Definitions
+      At line 63 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 685 in file ..\Src\core\startup_ARMCM7.s
+Comment: __heap_limit used once
+4 symbols
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+RESET 00000000
+
+Symbol: RESET
+   Definitions
+      At line 72 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      None
+Comment: RESET unused
+__Vectors 00000000
+
+Symbol: __Vectors
+   Definitions
+      At line 77 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 73 in file ..\Src\core\startup_ARMCM7.s
+      At line 255 in file ..\Src\core\startup_ARMCM7.s
+
+__Vectors_End 000002B0
+
+Symbol: __Vectors_End
+   Definitions
+      At line 253 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 74 in file ..\Src\core\startup_ARMCM7.s
+      At line 255 in file ..\Src\core\startup_ARMCM7.s
+
+3 symbols
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+.text 00000000
+
+Symbol: .text
+   Definitions
+      At line 257 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      None
+Comment: .text unused
+AESSM4_IRQHandler 00000088
+
+Symbol: AESSM4_IRQHandler
+   Definitions
+      At line 537 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 114 in file ..\Src\core\startup_ARMCM7.s
+      At line 388 in file ..\Src\core\startup_ARMCM7.s
+
+AXIDMA_IRQHandler 00000088
+
+Symbol: AXIDMA_IRQHandler
+   Definitions
+      At line 573 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 155 in file ..\Src\core\startup_ARMCM7.s
+      At line 424 in file ..\Src\core\startup_ARMCM7.s
+
+BOFF2_TRWARN_IRQHandler 00000088
+
+Symbol: BOFF2_TRWARN_IRQHandler
+   Definitions
+      At line 591 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 173 in file ..\Src\core\startup_ARMCM7.s
+      At line 442 in file ..\Src\core\startup_ARMCM7.s
+
+BOFF_TRWARN_IRQHandler 00000088
+
+Symbol: BOFF_TRWARN_IRQHandler
+   Definitions
+      At line 583 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 165 in file ..\Src\core\startup_ARMCM7.s
+      At line 434 in file ..\Src\core\startup_ARMCM7.s
+
+BusFault_Handler 0000007C
+
+Symbol: BusFault_Handler
+   Definitions
+      At line 344 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 82 in file ..\Src\core\startup_ARMCM7.s
+      At line 345 in file ..\Src\core\startup_ARMCM7.s
+
+CAN1_BUF00_03_IRQHandler 00000088
+
+Symbol: CAN1_BUF00_03_IRQHandler
+   Definitions
+      At line 577 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+
+
+
+ARM Macro Assembler    Page 2 Alphabetic symbol ordering
+Relocatable symbols
+
+      At line 159 in file ..\Src\core\startup_ARMCM7.s
+      At line 428 in file ..\Src\core\startup_ARMCM7.s
+
+CAN1_BUF04_07_IRQHandler 00000088
+
+Symbol: CAN1_BUF04_07_IRQHandler
+   Definitions
+      At line 578 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 160 in file ..\Src\core\startup_ARMCM7.s
+      At line 429 in file ..\Src\core\startup_ARMCM7.s
+
+CAN1_BUF08_11_IRQHandler 00000088
+
+Symbol: CAN1_BUF08_11_IRQHandler
+   Definitions
+      At line 579 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 161 in file ..\Src\core\startup_ARMCM7.s
+      At line 430 in file ..\Src\core\startup_ARMCM7.s
+
+CAN1_BUF12_15_IRQHandler 00000088
+
+Symbol: CAN1_BUF12_15_IRQHandler
+   Definitions
+      At line 580 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 162 in file ..\Src\core\startup_ARMCM7.s
+      At line 431 in file ..\Src\core\startup_ARMCM7.s
+
+CAN1_BUF16_31_IRQHandler 00000088
+
+Symbol: CAN1_BUF16_31_IRQHandler
+   Definitions
+      At line 581 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 163 in file ..\Src\core\startup_ARMCM7.s
+      At line 432 in file ..\Src\core\startup_ARMCM7.s
+
+CAN1_BUF32_63_IRQHandler 00000088
+
+Symbol: CAN1_BUF32_63_IRQHandler
+   Definitions
+      At line 582 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 164 in file ..\Src\core\startup_ARMCM7.s
+      At line 433 in file ..\Src\core\startup_ARMCM7.s
+
+CAN1_ERR_IRQHandler 00000088
+
+Symbol: CAN1_ERR_IRQHandler
+   Definitions
+      At line 584 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 166 in file ..\Src\core\startup_ARMCM7.s
+      At line 435 in file ..\Src\core\startup_ARMCM7.s
+
+CAN2_BUF00_03_IRQHandler 00000088
+
+
+
+
+ARM Macro Assembler    Page 3 Alphabetic symbol ordering
+Relocatable symbols
+
+Symbol: CAN2_BUF00_03_IRQHandler
+   Definitions
+      At line 585 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 167 in file ..\Src\core\startup_ARMCM7.s
+      At line 436 in file ..\Src\core\startup_ARMCM7.s
+
+CAN2_BUF04_07_IRQHandler 00000088
+
+Symbol: CAN2_BUF04_07_IRQHandler
+   Definitions
+      At line 586 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 168 in file ..\Src\core\startup_ARMCM7.s
+      At line 437 in file ..\Src\core\startup_ARMCM7.s
+
+CAN2_BUF08_11_IRQHandler 00000088
+
+Symbol: CAN2_BUF08_11_IRQHandler
+   Definitions
+      At line 587 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 169 in file ..\Src\core\startup_ARMCM7.s
+      At line 438 in file ..\Src\core\startup_ARMCM7.s
+
+CAN2_BUF12_15_IRQHandler 00000088
+
+Symbol: CAN2_BUF12_15_IRQHandler
+   Definitions
+      At line 588 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 170 in file ..\Src\core\startup_ARMCM7.s
+      At line 439 in file ..\Src\core\startup_ARMCM7.s
+
+CAN2_BUF16_31_IRQHandler 00000088
+
+Symbol: CAN2_BUF16_31_IRQHandler
+   Definitions
+      At line 589 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 171 in file ..\Src\core\startup_ARMCM7.s
+      At line 440 in file ..\Src\core\startup_ARMCM7.s
+
+CAN2_BUF32_63_IRQHandler 00000088
+
+Symbol: CAN2_BUF32_63_IRQHandler
+   Definitions
+      At line 590 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 172 in file ..\Src\core\startup_ARMCM7.s
+      At line 441 in file ..\Src\core\startup_ARMCM7.s
+
+CAN2_ERR_IRQHandler 00000088
+
+Symbol: CAN2_ERR_IRQHandler
+   Definitions
+      At line 592 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 174 in file ..\Src\core\startup_ARMCM7.s
+
+
+
+ARM Macro Assembler    Page 4 Alphabetic symbol ordering
+Relocatable symbols
+
+      At line 443 in file ..\Src\core\startup_ARMCM7.s
+
+CPM_IRQHandler 00000088
+
+Symbol: CPM_IRQHandler
+   Definitions
+      At line 533 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 109 in file ..\Src\core\startup_ARMCM7.s
+      At line 384 in file ..\Src\core\startup_ARMCM7.s
+
+DAC_IRQHandler 00000088
+
+Symbol: DAC_IRQHandler
+   Definitions
+      At line 539 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 116 in file ..\Src\core\startup_ARMCM7.s
+      At line 390 in file ..\Src\core\startup_ARMCM7.s
+
+DMA1_IRQHandler 00000088
+
+Symbol: DMA1_IRQHandler
+   Definitions
+      At line 529 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 102 in file ..\Src\core\startup_ARMCM7.s
+      At line 380 in file ..\Src\core\startup_ARMCM7.s
+
+DMA2D_IRQHandler 00000088
+
+Symbol: DMA2D_IRQHandler
+   Definitions
+      At line 536 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 112 in file ..\Src\core\startup_ARMCM7.s
+      At line 387 in file ..\Src\core\startup_ARMCM7.s
+
+DMA2_IRQHandler 00000088
+
+Symbol: DMA2_IRQHandler
+   Definitions
+      At line 530 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 103 in file ..\Src\core\startup_ARMCM7.s
+      At line 381 in file ..\Src\core\startup_ARMCM7.s
+
+DebugMon_Handler 00000082
+
+Symbol: DebugMon_Handler
+   Definitions
+      At line 358 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 89 in file ..\Src\core\startup_ARMCM7.s
+      At line 359 in file ..\Src\core\startup_ARMCM7.s
+
+Default_Handler 00000088
+
+Symbol: Default_Handler
+
+
+
+ARM Macro Assembler    Page 5 Alphabetic symbol ordering
+Relocatable symbols
+
+   Definitions
+      At line 371 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      None
+Comment: Default_Handler unused
+EPORT0_0_IRQHandler 00000088
+
+Symbol: EPORT0_0_IRQHandler
+   Definitions
+      At line 554 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 136 in file ..\Src\core\startup_ARMCM7.s
+      At line 405 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT0_1_IRQHandler 00000088
+
+Symbol: EPORT0_1_IRQHandler
+   Definitions
+      At line 555 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 137 in file ..\Src\core\startup_ARMCM7.s
+      At line 406 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT0_2_IRQHandler 00000088
+
+Symbol: EPORT0_2_IRQHandler
+   Definitions
+      At line 556 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 138 in file ..\Src\core\startup_ARMCM7.s
+      At line 407 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT0_3_IRQHandler 00000088
+
+Symbol: EPORT0_3_IRQHandler
+   Definitions
+      At line 557 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 139 in file ..\Src\core\startup_ARMCM7.s
+      At line 408 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT0_4_IRQHandler 00000088
+
+Symbol: EPORT0_4_IRQHandler
+   Definitions
+      At line 558 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 140 in file ..\Src\core\startup_ARMCM7.s
+      At line 409 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT0_5_IRQHandler 00000088
+
+Symbol: EPORT0_5_IRQHandler
+   Definitions
+      At line 559 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 141 in file ..\Src\core\startup_ARMCM7.s
+      At line 410 in file ..\Src\core\startup_ARMCM7.s
+
+
+
+
+ARM Macro Assembler    Page 6 Alphabetic symbol ordering
+Relocatable symbols
+
+EPORT0_6_IRQHandler 00000088
+
+Symbol: EPORT0_6_IRQHandler
+   Definitions
+      At line 560 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 142 in file ..\Src\core\startup_ARMCM7.s
+      At line 411 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT0_7_IRQHandler 00000088
+
+Symbol: EPORT0_7_IRQHandler
+   Definitions
+      At line 561 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 143 in file ..\Src\core\startup_ARMCM7.s
+      At line 412 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT1_0_IRQHandler 00000088
+
+Symbol: EPORT1_0_IRQHandler
+   Definitions
+      At line 562 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 144 in file ..\Src\core\startup_ARMCM7.s
+      At line 413 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT1_1_IRQHandler 00000088
+
+Symbol: EPORT1_1_IRQHandler
+   Definitions
+      At line 563 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 145 in file ..\Src\core\startup_ARMCM7.s
+      At line 414 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT1_2_IRQHandler 00000088
+
+Symbol: EPORT1_2_IRQHandler
+   Definitions
+      At line 564 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 146 in file ..\Src\core\startup_ARMCM7.s
+      At line 415 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT1_3_IRQHandler 00000088
+
+Symbol: EPORT1_3_IRQHandler
+   Definitions
+      At line 565 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 147 in file ..\Src\core\startup_ARMCM7.s
+      At line 416 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT1_4_IRQHandler 00000088
+
+Symbol: EPORT1_4_IRQHandler
+   Definitions
+      At line 566 in file ..\Src\core\startup_ARMCM7.s
+
+
+
+ARM Macro Assembler    Page 7 Alphabetic symbol ordering
+Relocatable symbols
+
+   Uses
+      At line 148 in file ..\Src\core\startup_ARMCM7.s
+      At line 417 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT1_5_IRQHandler 00000088
+
+Symbol: EPORT1_5_IRQHandler
+   Definitions
+      At line 567 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 149 in file ..\Src\core\startup_ARMCM7.s
+      At line 418 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT1_6_IRQHandler 00000088
+
+Symbol: EPORT1_6_IRQHandler
+   Definitions
+      At line 568 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 150 in file ..\Src\core\startup_ARMCM7.s
+      At line 419 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT1_7_IRQHandler 00000088
+
+Symbol: EPORT1_7_IRQHandler
+   Definitions
+      At line 569 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 151 in file ..\Src\core\startup_ARMCM7.s
+      At line 420 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT2_0_IRQHandler 00000088
+
+Symbol: EPORT2_0_IRQHandler
+   Definitions
+      At line 605 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 187 in file ..\Src\core\startup_ARMCM7.s
+      At line 456 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT2_1_IRQHandler 00000088
+
+Symbol: EPORT2_1_IRQHandler
+   Definitions
+      At line 606 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 188 in file ..\Src\core\startup_ARMCM7.s
+      At line 457 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT2_2_IRQHandler 00000088
+
+Symbol: EPORT2_2_IRQHandler
+   Definitions
+      At line 607 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 189 in file ..\Src\core\startup_ARMCM7.s
+      At line 458 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT2_3_IRQHandler 00000088
+
+
+
+ARM Macro Assembler    Page 8 Alphabetic symbol ordering
+Relocatable symbols
+
+
+Symbol: EPORT2_3_IRQHandler
+   Definitions
+      At line 608 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 190 in file ..\Src\core\startup_ARMCM7.s
+      At line 459 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT2_4_IRQHandler 00000088
+
+Symbol: EPORT2_4_IRQHandler
+   Definitions
+      At line 609 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 191 in file ..\Src\core\startup_ARMCM7.s
+      At line 460 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT2_5_IRQHandler 00000088
+
+Symbol: EPORT2_5_IRQHandler
+   Definitions
+      At line 610 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 192 in file ..\Src\core\startup_ARMCM7.s
+      At line 461 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT2_6_IRQHandler 00000088
+
+Symbol: EPORT2_6_IRQHandler
+   Definitions
+      At line 611 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 193 in file ..\Src\core\startup_ARMCM7.s
+      At line 462 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT2_7_IRQHandler 00000088
+
+Symbol: EPORT2_7_IRQHandler
+   Definitions
+      At line 612 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 194 in file ..\Src\core\startup_ARMCM7.s
+      At line 463 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT3_0_IRQHandler 00000088
+
+Symbol: EPORT3_0_IRQHandler
+   Definitions
+      At line 613 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 195 in file ..\Src\core\startup_ARMCM7.s
+      At line 464 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT3_1_IRQHandler 00000088
+
+Symbol: EPORT3_1_IRQHandler
+   Definitions
+      At line 614 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+
+
+
+ARM Macro Assembler    Page 9 Alphabetic symbol ordering
+Relocatable symbols
+
+      At line 196 in file ..\Src\core\startup_ARMCM7.s
+      At line 465 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT3_2_IRQHandler 00000088
+
+Symbol: EPORT3_2_IRQHandler
+   Definitions
+      At line 615 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 197 in file ..\Src\core\startup_ARMCM7.s
+      At line 466 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT3_3_IRQHandler 00000088
+
+Symbol: EPORT3_3_IRQHandler
+   Definitions
+      At line 616 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 198 in file ..\Src\core\startup_ARMCM7.s
+      At line 467 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT3_4_IRQHandler 00000088
+
+Symbol: EPORT3_4_IRQHandler
+   Definitions
+      At line 617 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 199 in file ..\Src\core\startup_ARMCM7.s
+      At line 468 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT3_5_IRQHandler 00000088
+
+Symbol: EPORT3_5_IRQHandler
+   Definitions
+      At line 618 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 200 in file ..\Src\core\startup_ARMCM7.s
+      At line 469 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT3_6_IRQHandler 00000088
+
+Symbol: EPORT3_6_IRQHandler
+   Definitions
+      At line 619 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 201 in file ..\Src\core\startup_ARMCM7.s
+      At line 470 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT3_7_IRQHandler 00000088
+
+Symbol: EPORT3_7_IRQHandler
+   Definitions
+      At line 620 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 202 in file ..\Src\core\startup_ARMCM7.s
+      At line 471 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT4_0_IRQHandler 00000088
+
+
+
+
+ARM Macro Assembler    Page 10 Alphabetic symbol ordering
+Relocatable symbols
+
+Symbol: EPORT4_0_IRQHandler
+   Definitions
+      At line 621 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 203 in file ..\Src\core\startup_ARMCM7.s
+      At line 472 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT4_1_IRQHandler 00000088
+
+Symbol: EPORT4_1_IRQHandler
+   Definitions
+      At line 622 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 204 in file ..\Src\core\startup_ARMCM7.s
+      At line 473 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT4_2_IRQHandler 00000088
+
+Symbol: EPORT4_2_IRQHandler
+   Definitions
+      At line 623 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 205 in file ..\Src\core\startup_ARMCM7.s
+      At line 474 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT4_3_IRQHandler 00000088
+
+Symbol: EPORT4_3_IRQHandler
+   Definitions
+      At line 624 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 206 in file ..\Src\core\startup_ARMCM7.s
+      At line 475 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT4_4_IRQHandler 00000088
+
+Symbol: EPORT4_4_IRQHandler
+   Definitions
+      At line 625 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 207 in file ..\Src\core\startup_ARMCM7.s
+      At line 476 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT4_5_IRQHandler 00000088
+
+Symbol: EPORT4_5_IRQHandler
+   Definitions
+      At line 626 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 208 in file ..\Src\core\startup_ARMCM7.s
+      At line 477 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT4_6_IRQHandler 00000088
+
+Symbol: EPORT4_6_IRQHandler
+   Definitions
+      At line 627 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 209 in file ..\Src\core\startup_ARMCM7.s
+
+
+
+ARM Macro Assembler    Page 11 Alphabetic symbol ordering
+Relocatable symbols
+
+      At line 478 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT4_7_IRQHandler 00000088
+
+Symbol: EPORT4_7_IRQHandler
+   Definitions
+      At line 628 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 210 in file ..\Src\core\startup_ARMCM7.s
+      At line 479 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT5_0_IRQHandler 00000088
+
+Symbol: EPORT5_0_IRQHandler
+   Definitions
+      At line 629 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 211 in file ..\Src\core\startup_ARMCM7.s
+      At line 480 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT5_1_IRQHandler 00000088
+
+Symbol: EPORT5_1_IRQHandler
+   Definitions
+      At line 630 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 212 in file ..\Src\core\startup_ARMCM7.s
+      At line 481 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT5_2_IRQHandler 00000088
+
+Symbol: EPORT5_2_IRQHandler
+   Definitions
+      At line 631 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 213 in file ..\Src\core\startup_ARMCM7.s
+      At line 482 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT5_3_IRQHandler 00000088
+
+Symbol: EPORT5_3_IRQHandler
+   Definitions
+      At line 632 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 214 in file ..\Src\core\startup_ARMCM7.s
+      At line 483 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT5_4_IRQHandler 00000088
+
+Symbol: EPORT5_4_IRQHandler
+   Definitions
+      At line 633 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 215 in file ..\Src\core\startup_ARMCM7.s
+      At line 484 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT5_5_IRQHandler 00000088
+
+Symbol: EPORT5_5_IRQHandler
+
+
+
+ARM Macro Assembler    Page 12 Alphabetic symbol ordering
+Relocatable symbols
+
+   Definitions
+      At line 634 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 216 in file ..\Src\core\startup_ARMCM7.s
+      At line 485 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT5_6_IRQHandler 00000088
+
+Symbol: EPORT5_6_IRQHandler
+   Definitions
+      At line 635 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 217 in file ..\Src\core\startup_ARMCM7.s
+      At line 486 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT5_7_IRQHandler 00000088
+
+Symbol: EPORT5_7_IRQHandler
+   Definitions
+      At line 636 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 218 in file ..\Src\core\startup_ARMCM7.s
+      At line 487 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT6_0_IRQHandler 00000088
+
+Symbol: EPORT6_0_IRQHandler
+   Definitions
+      At line 637 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 219 in file ..\Src\core\startup_ARMCM7.s
+      At line 488 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT6_1_IRQHandler 00000088
+
+Symbol: EPORT6_1_IRQHandler
+   Definitions
+      At line 638 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 220 in file ..\Src\core\startup_ARMCM7.s
+      At line 489 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT6_2_IRQHandler 00000088
+
+Symbol: EPORT6_2_IRQHandler
+   Definitions
+      At line 639 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 221 in file ..\Src\core\startup_ARMCM7.s
+      At line 490 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT6_3_IRQHandler 00000088
+
+Symbol: EPORT6_3_IRQHandler
+   Definitions
+      At line 640 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 222 in file ..\Src\core\startup_ARMCM7.s
+      At line 491 in file ..\Src\core\startup_ARMCM7.s
+
+
+
+ARM Macro Assembler    Page 13 Alphabetic symbol ordering
+Relocatable symbols
+
+
+EPORT6_4_IRQHandler 00000088
+
+Symbol: EPORT6_4_IRQHandler
+   Definitions
+      At line 641 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 223 in file ..\Src\core\startup_ARMCM7.s
+      At line 492 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT6_5_IRQHandler 00000088
+
+Symbol: EPORT6_5_IRQHandler
+   Definitions
+      At line 642 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 224 in file ..\Src\core\startup_ARMCM7.s
+      At line 493 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT6_6_IRQHandler 00000088
+
+Symbol: EPORT6_6_IRQHandler
+   Definitions
+      At line 643 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 225 in file ..\Src\core\startup_ARMCM7.s
+      At line 494 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT6_7_IRQHandler 00000088
+
+Symbol: EPORT6_7_IRQHandler
+   Definitions
+      At line 644 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 226 in file ..\Src\core\startup_ARMCM7.s
+      At line 495 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT7_0_IRQHandler 00000088
+
+Symbol: EPORT7_0_IRQHandler
+   Definitions
+      At line 645 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 227 in file ..\Src\core\startup_ARMCM7.s
+      At line 496 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT7_1_IRQHandler 00000088
+
+Symbol: EPORT7_1_IRQHandler
+   Definitions
+      At line 646 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 228 in file ..\Src\core\startup_ARMCM7.s
+      At line 497 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT7_2_IRQHandler 00000088
+
+Symbol: EPORT7_2_IRQHandler
+   Definitions
+
+
+
+ARM Macro Assembler    Page 14 Alphabetic symbol ordering
+Relocatable symbols
+
+      At line 647 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 229 in file ..\Src\core\startup_ARMCM7.s
+      At line 498 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT7_3_IRQHandler 00000088
+
+Symbol: EPORT7_3_IRQHandler
+   Definitions
+      At line 648 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 230 in file ..\Src\core\startup_ARMCM7.s
+      At line 499 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT7_4_IRQHandler 00000088
+
+Symbol: EPORT7_4_IRQHandler
+   Definitions
+      At line 649 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 231 in file ..\Src\core\startup_ARMCM7.s
+      At line 500 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT7_5_IRQHandler 00000088
+
+Symbol: EPORT7_5_IRQHandler
+   Definitions
+      At line 650 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 232 in file ..\Src\core\startup_ARMCM7.s
+      At line 501 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT7_6_IRQHandler 00000088
+
+Symbol: EPORT7_6_IRQHandler
+   Definitions
+      At line 651 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 233 in file ..\Src\core\startup_ARMCM7.s
+      At line 502 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT7_7_IRQHandler 00000088
+
+Symbol: EPORT7_7_IRQHandler
+   Definitions
+      At line 652 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 234 in file ..\Src\core\startup_ARMCM7.s
+      At line 503 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT8_0_IRQHandler 00000088
+
+Symbol: EPORT8_0_IRQHandler
+   Definitions
+      At line 653 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 235 in file ..\Src\core\startup_ARMCM7.s
+      At line 504 in file ..\Src\core\startup_ARMCM7.s
+
+
+
+
+ARM Macro Assembler    Page 15 Alphabetic symbol ordering
+Relocatable symbols
+
+EPORT8_1_IRQHandler 00000088
+
+Symbol: EPORT8_1_IRQHandler
+   Definitions
+      At line 654 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 236 in file ..\Src\core\startup_ARMCM7.s
+      At line 505 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT8_2_IRQHandler 00000088
+
+Symbol: EPORT8_2_IRQHandler
+   Definitions
+      At line 655 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 237 in file ..\Src\core\startup_ARMCM7.s
+      At line 506 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT8_3_IRQHandler 00000088
+
+Symbol: EPORT8_3_IRQHandler
+   Definitions
+      At line 656 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 238 in file ..\Src\core\startup_ARMCM7.s
+      At line 507 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT8_4_IRQHandler 00000088
+
+Symbol: EPORT8_4_IRQHandler
+   Definitions
+      At line 657 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 239 in file ..\Src\core\startup_ARMCM7.s
+      At line 508 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT8_5_IRQHandler 00000088
+
+Symbol: EPORT8_5_IRQHandler
+   Definitions
+      At line 658 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 240 in file ..\Src\core\startup_ARMCM7.s
+      At line 509 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT8_6_IRQHandler 00000088
+
+Symbol: EPORT8_6_IRQHandler
+   Definitions
+      At line 659 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 241 in file ..\Src\core\startup_ARMCM7.s
+      At line 510 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT8_7_IRQHandler 00000088
+
+Symbol: EPORT8_7_IRQHandler
+   Definitions
+      At line 660 in file ..\Src\core\startup_ARMCM7.s
+
+
+
+ARM Macro Assembler    Page 16 Alphabetic symbol ordering
+Relocatable symbols
+
+   Uses
+      At line 242 in file ..\Src\core\startup_ARMCM7.s
+      At line 511 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT9_0_IRQHandler 00000088
+
+Symbol: EPORT9_0_IRQHandler
+   Definitions
+      At line 661 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 243 in file ..\Src\core\startup_ARMCM7.s
+      At line 512 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT9_1_IRQHandler 00000088
+
+Symbol: EPORT9_1_IRQHandler
+   Definitions
+      At line 662 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 244 in file ..\Src\core\startup_ARMCM7.s
+      At line 513 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT9_2_IRQHandler 00000088
+
+Symbol: EPORT9_2_IRQHandler
+   Definitions
+      At line 663 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 245 in file ..\Src\core\startup_ARMCM7.s
+      At line 514 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT9_3_IRQHandler 00000088
+
+Symbol: EPORT9_3_IRQHandler
+   Definitions
+      At line 664 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 246 in file ..\Src\core\startup_ARMCM7.s
+      At line 515 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT9_4_IRQHandler 00000088
+
+Symbol: EPORT9_4_IRQHandler
+   Definitions
+      At line 665 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 247 in file ..\Src\core\startup_ARMCM7.s
+      At line 516 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT9_5_IRQHandler 00000088
+
+Symbol: EPORT9_5_IRQHandler
+   Definitions
+      At line 666 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 248 in file ..\Src\core\startup_ARMCM7.s
+      At line 517 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT9_6_IRQHandler 00000088
+
+
+
+ARM Macro Assembler    Page 17 Alphabetic symbol ordering
+Relocatable symbols
+
+
+Symbol: EPORT9_6_IRQHandler
+   Definitions
+      At line 667 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 249 in file ..\Src\core\startup_ARMCM7.s
+      At line 518 in file ..\Src\core\startup_ARMCM7.s
+
+EPORT9_7_IRQHandler 00000088
+
+Symbol: EPORT9_7_IRQHandler
+   Definitions
+      At line 668 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 250 in file ..\Src\core\startup_ARMCM7.s
+      At line 519 in file ..\Src\core\startup_ARMCM7.s
+
+GMAC_IRQHandler 00000088
+
+Symbol: GMAC_IRQHandler
+   Definitions
+      At line 552 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 130 in file ..\Src\core\startup_ARMCM7.s
+      At line 403 in file ..\Src\core\startup_ARMCM7.s
+
+HardFault_Handler 00000078
+
+Symbol: HardFault_Handler
+   Definitions
+      At line 334 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 80 in file ..\Src\core\startup_ARMCM7.s
+      At line 335 in file ..\Src\core\startup_ARMCM7.s
+
+I2C1_IRQHandler 00000088
+
+Symbol: I2C1_IRQHandler
+   Definitions
+      At line 553 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 131 in file ..\Src\core\startup_ARMCM7.s
+      At line 404 in file ..\Src\core\startup_ARMCM7.s
+
+I2C2_IRQHandler 00000088
+
+Symbol: I2C2_IRQHandler
+   Definitions
+      At line 572 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 154 in file ..\Src\core\startup_ARMCM7.s
+      At line 423 in file ..\Src\core\startup_ARMCM7.s
+
+I2S1_IRQHandler 00000088
+
+Symbol: I2S1_IRQHandler
+   Definitions
+      At line 593 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+
+
+
+ARM Macro Assembler    Page 18 Alphabetic symbol ordering
+Relocatable symbols
+
+      At line 175 in file ..\Src\core\startup_ARMCM7.s
+      At line 444 in file ..\Src\core\startup_ARMCM7.s
+
+I2S2_IRQHandler 00000088
+
+Symbol: I2S2_IRQHandler
+   Definitions
+      At line 594 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 176 in file ..\Src\core\startup_ARMCM7.s
+      At line 445 in file ..\Src\core\startup_ARMCM7.s
+
+IMGAGE_DECODER_IRQHandler 00000088
+
+Symbol: IMGAGE_DECODER_IRQHandler
+   Definitions
+      At line 604 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 186 in file ..\Src\core\startup_ARMCM7.s
+      At line 455 in file ..\Src\core\startup_ARMCM7.s
+
+JPEG_ACCELERATOR_IRQHandler 00000088
+
+Symbol: JPEG_ACCELERATOR_IRQHandler
+   Definitions
+      At line 571 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 153 in file ..\Src\core\startup_ARMCM7.s
+      At line 422 in file ..\Src\core\startup_ARMCM7.s
+
+LCDC_BUS_ERROR_IRQHandler 00000088
+
+Symbol: LCDC_BUS_ERROR_IRQHandler
+   Definitions
+      At line 600 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 182 in file ..\Src\core\startup_ARMCM7.s
+      At line 451 in file ..\Src\core\startup_ARMCM7.s
+
+LCDC_CRC_ERROR_IRQHandler 00000088
+
+Symbol: LCDC_CRC_ERROR_IRQHandler
+   Definitions
+      At line 595 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 177 in file ..\Src\core\startup_ARMCM7.s
+      At line 446 in file ..\Src\core\startup_ARMCM7.s
+
+LCDC_FIFO_UNDERRUN_IRQHandler 00000088
+
+Symbol: LCDC_FIFO_UNDERRUN_IRQHandler
+   Definitions
+      At line 601 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 183 in file ..\Src\core\startup_ARMCM7.s
+      At line 452 in file ..\Src\core\startup_ARMCM7.s
+
+LCDC_FIFO_WARN_IRQHandler 00000088
+
+
+
+
+ARM Macro Assembler    Page 19 Alphabetic symbol ordering
+Relocatable symbols
+
+Symbol: LCDC_FIFO_WARN_IRQHandler
+   Definitions
+      At line 602 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 184 in file ..\Src\core\startup_ARMCM7.s
+      At line 453 in file ..\Src\core\startup_ARMCM7.s
+
+LCDC_IRQ_SCANLINE_IRQHandler 00000088
+
+Symbol: LCDC_IRQ_SCANLINE_IRQHandler
+   Definitions
+      At line 603 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 185 in file ..\Src\core\startup_ARMCM7.s
+      At line 454 in file ..\Src\core\startup_ARMCM7.s
+
+LCDC_REG_RELOAD_IRQHandler 00000088
+
+Symbol: LCDC_REG_RELOAD_IRQHandler
+   Definitions
+      At line 596 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 178 in file ..\Src\core\startup_ARMCM7.s
+      At line 447 in file ..\Src\core\startup_ARMCM7.s
+
+LCDC_ROT_ERROR_IRQHandler 00000088
+
+Symbol: LCDC_ROT_ERROR_IRQHandler
+   Definitions
+      At line 576 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 158 in file ..\Src\core\startup_ARMCM7.s
+      At line 427 in file ..\Src\core\startup_ARMCM7.s
+
+MemManage_Handler 0000007A
+
+Symbol: MemManage_Handler
+   Definitions
+      At line 339 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 81 in file ..\Src\core\startup_ARMCM7.s
+      At line 340 in file ..\Src\core\startup_ARMCM7.s
+
+NMI_Handler 00000076
+
+Symbol: NMI_Handler
+   Definitions
+      At line 329 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 79 in file ..\Src\core\startup_ARMCM7.s
+      At line 330 in file ..\Src\core\startup_ARMCM7.s
+
+OTP_IRQHandler 00000088
+
+Symbol: OTP_IRQHandler
+   Definitions
+      At line 522 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 95 in file ..\Src\core\startup_ARMCM7.s
+
+
+
+ARM Macro Assembler    Page 20 Alphabetic symbol ordering
+Relocatable symbols
+
+      At line 373 in file ..\Src\core\startup_ARMCM7.s
+
+PIT1_IRQHandler 00000088
+
+Symbol: PIT1_IRQHandler
+   Definitions
+      At line 525 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 98 in file ..\Src\core\startup_ARMCM7.s
+      At line 376 in file ..\Src\core\startup_ARMCM7.s
+
+PIT2_IRQHandler 00000088
+
+Symbol: PIT2_IRQHandler
+   Definitions
+      At line 526 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 99 in file ..\Src\core\startup_ARMCM7.s
+      At line 377 in file ..\Src\core\startup_ARMCM7.s
+
+PMU_IRQHandler 00000088
+
+Symbol: PMU_IRQHandler
+   Definitions
+      At line 523 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 96 in file ..\Src\core\startup_ARMCM7.s
+      At line 374 in file ..\Src\core\startup_ARMCM7.s
+
+PMU_RTC_IRQHandler 00000088
+
+Symbol: PMU_RTC_IRQHandler
+   Definitions
+      At line 534 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 110 in file ..\Src\core\startup_ARMCM7.s
+      At line 385 in file ..\Src\core\startup_ARMCM7.s
+
+PSRAM_IRQHandler 00000088
+
+Symbol: PSRAM_IRQHandler
+   Definitions
+      At line 551 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 129 in file ..\Src\core\startup_ARMCM7.s
+      At line 402 in file ..\Src\core\startup_ARMCM7.s
+
+PWMT1_IRQHandler 00000088
+
+Symbol: PWMT1_IRQHandler
+   Definitions
+      At line 597 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 179 in file ..\Src\core\startup_ARMCM7.s
+      At line 448 in file ..\Src\core\startup_ARMCM7.s
+
+PWMT2_IRQHandler 00000088
+
+Symbol: PWMT2_IRQHandler
+
+
+
+ARM Macro Assembler    Page 21 Alphabetic symbol ordering
+Relocatable symbols
+
+   Definitions
+      At line 598 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 180 in file ..\Src\core\startup_ARMCM7.s
+      At line 449 in file ..\Src\core\startup_ARMCM7.s
+
+PWMT3_IRQHandler 00000088
+
+Symbol: PWMT3_IRQHandler
+   Definitions
+      At line 599 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 181 in file ..\Src\core\startup_ARMCM7.s
+      At line 450 in file ..\Src\core\startup_ARMCM7.s
+
+PendSV_Handler 00000084
+
+Symbol: PendSV_Handler
+   Definitions
+      At line 362 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 91 in file ..\Src\core\startup_ARMCM7.s
+      At line 363 in file ..\Src\core\startup_ARMCM7.s
+
+QADC_IRQHandler 00000088
+
+Symbol: QADC_IRQHandler
+   Definitions
+      At line 538 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 115 in file ..\Src\core\startup_ARMCM7.s
+      At line 389 in file ..\Src\core\startup_ARMCM7.s
+
+Reset_Handler 00000000
+
+Symbol: Reset_Handler
+   Definitions
+      At line 262 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 78 in file ..\Src\core\startup_ARMCM7.s
+      At line 263 in file ..\Src\core\startup_ARMCM7.s
+
+SD_IRQHandler 00000088
+
+Symbol: SD_IRQHandler
+   Definitions
+      At line 535 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 111 in file ..\Src\core\startup_ARMCM7.s
+      At line 386 in file ..\Src\core\startup_ARMCM7.s
+
+SEC_FD_IRQHandler 00000088
+
+Symbol: SEC_FD_IRQHandler
+   Definitions
+      At line 532 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 106 in file ..\Src\core\startup_ARMCM7.s
+      At line 383 in file ..\Src\core\startup_ARMCM7.s
+
+
+
+ARM Macro Assembler    Page 22 Alphabetic symbol ordering
+Relocatable symbols
+
+
+SPI1_IRQHandler 00000088
+
+Symbol: SPI1_IRQHandler
+   Definitions
+      At line 543 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 121 in file ..\Src\core\startup_ARMCM7.s
+      At line 394 in file ..\Src\core\startup_ARMCM7.s
+
+SPI2_IRQHandler 00000088
+
+Symbol: SPI2_IRQHandler
+   Definitions
+      At line 544 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 122 in file ..\Src\core\startup_ARMCM7.s
+      At line 395 in file ..\Src\core\startup_ARMCM7.s
+
+SPI3_IRQHandler 00000088
+
+Symbol: SPI3_IRQHandler
+   Definitions
+      At line 545 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 123 in file ..\Src\core\startup_ARMCM7.s
+      At line 396 in file ..\Src\core\startup_ARMCM7.s
+
+SPIM1_IRQHandler 00000088
+
+Symbol: SPIM1_IRQHandler
+   Definitions
+      At line 546 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 124 in file ..\Src\core\startup_ARMCM7.s
+      At line 397 in file ..\Src\core\startup_ARMCM7.s
+
+SPIM2_IRQHandler 00000088
+
+Symbol: SPIM2_IRQHandler
+   Definitions
+      At line 547 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 125 in file ..\Src\core\startup_ARMCM7.s
+      At line 398 in file ..\Src\core\startup_ARMCM7.s
+
+SPIM3_IRQHandler 00000088
+
+Symbol: SPIM3_IRQHandler
+   Definitions
+      At line 548 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 126 in file ..\Src\core\startup_ARMCM7.s
+      At line 399 in file ..\Src\core\startup_ARMCM7.s
+
+SSISLV1_IRQHandler 00000088
+
+Symbol: SSISLV1_IRQHandler
+   Definitions
+
+
+
+ARM Macro Assembler    Page 23 Alphabetic symbol ordering
+Relocatable symbols
+
+      At line 570 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 152 in file ..\Src\core\startup_ARMCM7.s
+      At line 421 in file ..\Src\core\startup_ARMCM7.s
+
+SVC_Handler 00000080
+
+Symbol: SVC_Handler
+   Definitions
+      At line 353 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 88 in file ..\Src\core\startup_ARMCM7.s
+      At line 354 in file ..\Src\core\startup_ARMCM7.s
+
+SysTick_Handler 00000086
+
+Symbol: SysTick_Handler
+   Definitions
+      At line 366 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 92 in file ..\Src\core\startup_ARMCM7.s
+      At line 367 in file ..\Src\core\startup_ARMCM7.s
+
+TC1_IRQHandler 00000088
+
+Symbol: TC1_IRQHandler
+   Definitions
+      At line 524 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 97 in file ..\Src\core\startup_ARMCM7.s
+      At line 375 in file ..\Src\core\startup_ARMCM7.s
+
+TC2_IRQHandler 00000088
+
+Symbol: TC2_IRQHandler
+   Definitions
+      At line 527 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 100 in file ..\Src\core\startup_ARMCM7.s
+      At line 378 in file ..\Src\core\startup_ARMCM7.s
+
+TC3_IRQHandler 00000088
+
+Symbol: TC3_IRQHandler
+   Definitions
+      At line 528 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 101 in file ..\Src\core\startup_ARMCM7.s
+      At line 379 in file ..\Src\core\startup_ARMCM7.s
+
+TRNG_IRQHandler 00000088
+
+Symbol: TRNG_IRQHandler
+   Definitions
+      At line 531 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 105 in file ..\Src\core\startup_ARMCM7.s
+      At line 382 in file ..\Src\core\startup_ARMCM7.s
+
+
+
+
+ARM Macro Assembler    Page 24 Alphabetic symbol ordering
+Relocatable symbols
+
+UART1_IRQHandler 00000088
+
+Symbol: UART1_IRQHandler
+   Definitions
+      At line 549 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 127 in file ..\Src\core\startup_ARMCM7.s
+      At line 400 in file ..\Src\core\startup_ARMCM7.s
+
+UART2_IRQHandler 00000088
+
+Symbol: UART2_IRQHandler
+   Definitions
+      At line 550 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 128 in file ..\Src\core\startup_ARMCM7.s
+      At line 401 in file ..\Src\core\startup_ARMCM7.s
+
+UART3_IRQHandler 00000088
+
+Symbol: UART3_IRQHandler
+   Definitions
+      At line 574 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 156 in file ..\Src\core\startup_ARMCM7.s
+      At line 425 in file ..\Src\core\startup_ARMCM7.s
+
+UART4_IRQHandler 00000088
+
+Symbol: UART4_IRQHandler
+   Definitions
+      At line 575 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 157 in file ..\Src\core\startup_ARMCM7.s
+      At line 426 in file ..\Src\core\startup_ARMCM7.s
+
+UART5_IRQHandler 00000088
+
+Symbol: UART5_IRQHandler
+   Definitions
+      At line 540 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 118 in file ..\Src\core\startup_ARMCM7.s
+      At line 391 in file ..\Src\core\startup_ARMCM7.s
+
+UART6_IRQHandler 00000088
+
+Symbol: UART6_IRQHandler
+   Definitions
+      At line 542 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 120 in file ..\Src\core\startup_ARMCM7.s
+      At line 393 in file ..\Src\core\startup_ARMCM7.s
+
+USB_IRQHandler 00000088
+
+Symbol: USB_IRQHandler
+   Definitions
+      At line 541 in file ..\Src\core\startup_ARMCM7.s
+
+
+
+ARM Macro Assembler    Page 25 Alphabetic symbol ordering
+Relocatable symbols
+
+   Uses
+      At line 119 in file ..\Src\core\startup_ARMCM7.s
+      At line 392 in file ..\Src\core\startup_ARMCM7.s
+
+UsageFault_Handler 0000007E
+
+Symbol: UsageFault_Handler
+   Definitions
+      At line 349 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 83 in file ..\Src\core\startup_ARMCM7.s
+      At line 350 in file ..\Src\core\startup_ARMCM7.s
+
+159 symbols
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Absolute symbols
+
+Heap_Size 00002000
+
+Symbol: Heap_Size
+   Definitions
+      At line 58 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 62 in file ..\Src\core\startup_ARMCM7.s
+Comment: Heap_Size used once
+Stack_Size 0000A000
+
+Symbol: Stack_Size
+   Definitions
+      At line 47 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 50 in file ..\Src\core\startup_ARMCM7.s
+Comment: Stack_Size used once
+__Vectors_Size 000002B0
+
+Symbol: __Vectors_Size
+   Definitions
+      At line 255 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 75 in file ..\Src\core\startup_ARMCM7.s
+Comment: __Vectors_Size used once
+3 symbols
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+External symbols
+
+IO_Latch_Clr 00000000
+
+Symbol: IO_Latch_Clr
+   Definitions
+      At line 292 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 293 in file ..\Src\core\startup_ARMCM7.s
+Comment: IO_Latch_Clr used once
+LVD_EN 00000000
+
+Symbol: LVD_EN
+   Definitions
+      At line 265 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 266 in file ..\Src\core\startup_ARMCM7.s
+Comment: LVD_EN used once
+SystemInit 00000000
+
+Symbol: SystemInit
+   Definitions
+      At line 296 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 314 in file ..\Src\core\startup_ARMCM7.s
+Comment: SystemInit used once
+__main 00000000
+
+Symbol: __main
+   Definitions
+      At line 297 in file ..\Src\core\startup_ARMCM7.s
+   Uses
+      At line 322 in file ..\Src\core\startup_ARMCM7.s
+Comment: __main used once
+4 symbols
+512 symbols in table

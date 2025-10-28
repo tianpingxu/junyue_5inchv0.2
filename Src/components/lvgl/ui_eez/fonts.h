@@ -1,0 +1,33 @@
+#ifndef EEZ_LVGL_UI_FONTS_H
+#define EEZ_LVGL_UI_FONTS_H
+
+#include <lvgl.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+extern const lv_font_t ui_font_harmony_os_sans_sc_regular_font_20;
+extern const lv_font_t ui_font_harmony_os_sans_sc_regular_font_24;
+extern const lv_font_t ui_font_harmony_os_sans_sc_regular_font_28;
+extern const lv_font_t ui_font_harmony_os_sans_sc_regular_font_32;
+extern const lv_font_t ui_font_harmony_os_sans_sc_regular_font_36;
+extern const lv_font_t ui_font_harmony_os_sans_sc_regular_font_48;
+extern const lv_font_t ui_font_harmony_os_sans_sc_regular_font_64;
+extern const lv_font_t ui_font_harmony_os_sans_sc_regular_font_72;
+extern const lv_font_t ui_font_harmony_os_sans_sc_regular_font_96;
+extern const lv_font_t ui_font_harmony_os_sans_sc_regular_font_112;
+extern const lv_font_t ui_font_harmony_os_sans_sc_regular_font_128;
+extern const lv_font_t ui_font_harmony_os_sans_kr_regular_font_24;
+extern const lv_font_t ui_font_harmony_os_sans_kr_regular_font_28;
+extern const lv_font_t ui_font_harmony_os_sans_kr_regular_font_32;
+extern const lv_font_t ui_font_harmony_os_sans_kr_regular_font_36;
+extern const lv_font_t ui_font_harmony_os_sans_sc_regular_font_28_backup;
+extern const lv_font_t ui_font_cal_sans_semi_bold_40;
+
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /*EEZ_LVGL_UI_FONTS_H*/
